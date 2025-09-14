@@ -1,0 +1,19 @@
+{
+  "nav": {
+    "readings": "Lecturas",
+    "live": "En vivo",
+    "shop": "Tienda",
+    "about": "Acerca de",
+    "dashboard": "Panel",
+    "wallet": "Agregar fondos"
+  },
+  "home": {
+    "tagline": "Una comunidad de psíquicos talentosos"
+  },
+  "about": {
+    "title": "Acerca de SoulSeer",
+    "p1": "En SoulSeer, nos dedicamos a brindar orientación espiritual ética, compasiva y sin juicios. Nuestra misión es doble: ofrecer a los clientes lecturas auténticas y centradas en el corazón, y mantener estándares éticos justos para nuestros lectores.",
+    "p2": "Fundada por la médium psíquica Emilynn, SoulSeer nació como respuesta a la codicia corporativa que domina muchas plataformas psíquicas. A diferencia de otras aplicaciones, nuestros lectores conservan la mayor parte de lo que ganan y participan activamente en la construcción de la plataforma.",
+    "p3": "SoulSeer es más que una aplicación: es una tribu del alma. Una comunidad de psíquicos con el llamado de la vida: guiar, sanar y empoderar a quienes buscan claridad en su camino."
+  }
+}

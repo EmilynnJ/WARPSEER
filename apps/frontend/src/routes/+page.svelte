@@ -1,11 +1,12 @@
 <script lang="ts">
+  import { t } from '$lib/i18n';
   const hero = 'https://i.postimg.cc/tRLSgCPb/HERO-IMAGE-1.jpg';
 </script>
 
 <section class="mx-auto max-w-6xl px-4 py-8">
   <header class="text-center py-8">
     <h1 class="font-script text-6xl md:text-7xl text-mystic-pink">SoulSeer</h1>
-    <p class="font-display text-xl md:text-2xl text-white/90">A Community of Gifted Psychics</p>
+    <p class="font-display text-xl md:text-2xl text-white/90">{$t('home.tagline')}</p>
   </header>
   <div class="rounded-2xl overflow-hidden shadow-2xl ring-1 ring-mystic-gold/30">
     <img src={hero} alt="SoulSeer Hero" class="w-full object-cover max-h-[460px]" />

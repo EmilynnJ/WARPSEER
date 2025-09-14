@@ -4,6 +4,8 @@
   import { api } from '$lib/api';
   import { page } from '$app/stores';
   let me: any = null;
+  let seconds = 0;
+  let intervalId: any = null;
   let ws: WebSocket | null = null;
   let pc: RTCPeerConnection;
   let localStream: MediaStream | null = null;
@@ -32,7 +34,10 @@
     document.getElementById('local').srcObject = localStream;
     localStream.getTracks().forEach((t) => pc.addTrack(t, localStream!));
 
-    ws = new WebSocket(env.backendBase.replace('http', 'ws') + `/signaling/ws/${uid}`);
+    // Include auth token for WS
+    const tokenResp = await fetch(env.backendBase + '/users/me', { headers: await (await import('$lib/api')).authHeaders() as any }).catch(() => null);
+    const token = await (await import('$lib/auth')).getAuthToken();
+    ws = new WebSocket(env.backendBase.replace('http', 'ws') + `/signaling/ws/${uid}?token=${encodeURIComponent(token || '')}`);
     ws.onmessage = async (ev) => {
       const msg = JSON.parse(ev.data);
       if (msg.type === 'offer') {
@@ -51,6 +56,9 @@
       if (ev.candidate) ws?.send(JSON.stringify({ type: 'ice', candidate: ev.candidate }));
     };
 
+    // Heartbeats every 5s to keep billing active
+    setInterval(() => ws?.send(JSON.stringify({ type: 'heartbeat' })), 5000);
+
     // Initiator creates offer
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
@@ -66,7 +74,14 @@
     localStream?.getVideoTracks().forEach((t) => (t.enabled = camOn));
   }
 
-  onMount(init);
+  onMount(async () => {
+    await init();
+    // client timer display synced loosely to server billing minutes
+    intervalId = setInterval(async () => {
+      const { data } = await api.get(`/sessions/${$page.params.uid}`);
+      seconds = data.total_seconds;
+    }, 5000);
+  });
 </script>
 
 <section class="mx-auto max-w-6xl px-4 py-6">
@@ -74,7 +89,8 @@
     <video id="local" class="w-full rounded-lg bg-black" autoplay playsinline muted></video>
     <video id="remote" class="w-full rounded-lg bg-black" autoplay playsinline></video>
   </div>
-  <div class="mt-4 flex gap-3">
+  <div class="mt-4 flex items-center gap-3">
+    <div class="px-3 py-2 rounded bg-white/10">Time: {Math.floor(seconds/60)}:{String(seconds%60).padStart(2,'0')}</div>
     <button class="px-4 py-2 rounded bg-mystic-pink text-black" on:click={toggleMic}>{micOn ? 'Mute' : 'Unmute'}</button>
     <button class="px-4 py-2 rounded bg-mystic-gold text-black" on:click={toggleCam}>{camOn ? 'Camera Off' : 'Camera On'}</button>
   </div>

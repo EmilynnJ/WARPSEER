@@ -3,6 +3,8 @@ from jose import jwt
 from ..auth import get_jwks
 from redis.asyncio import Redis as AsyncRedis
 from ..config import settings
+from ..db import SessionLocal
+from .. import models
 from typing import Dict, Any
 import json
 from ..config import settings
@@ -32,7 +34,17 @@ async def websocket_endpoint(ws: WebSocket, session_uid: str):
         kid = header.get("kid")
         key = next((k for k in jwks["keys"] if k["kid"] == kid), None)
         payload = jwt.decode(token, key, algorithms=[key["alg"]], audience=None, options={"verify_aud": False})
-        user_id = payload.get('sub')
+        clerk_id = payload.get('sub')
+        # map to numeric user id
+        db = SessionLocal()
+        try:
+            u = db.query(models.User).filter(models.User.clerk_user_id == clerk_id).one_or_none()
+            if not u:
+                await ws.close(code=4401)
+                return
+            user_id = u.id
+        finally:
+            db.close()
     except Exception:
         await ws.close(code=4401)
         return

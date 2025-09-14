@@ -86,6 +86,22 @@ async def accept_session(session_uid: str, token=Depends(get_current_user_token)
     db.commit()
     return {"ok": True}
 
+@router.post("/{session_uid}/reject")
+async def reject_session(session_uid: str, token=Depends(get_current_user_token), db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.clerk_user_id == token.get("sub")).one()
+    sess = db.query(models.Session).filter(models.Session.session_uid == session_uid).one_or_none()
+    if not sess:
+        raise HTTPException(404, "Not found")
+    if user.role != "reader" or user.id != sess.reader_id:
+        raise HTTPException(403, "Only assigned reader can reject")
+    if sess.status != 'requested':
+        raise HTTPException(400, "Only requested sessions can be rejected")
+    sess.status = "canceled"
+    sess.ended_at = datetime.utcnow()
+    db.add(sess)
+    db.commit()
+    return {"ok": True}
+
 @router.post("/{session_uid}/end")
 async def end_session(session_uid: str, token=Depends(get_current_user_token), db: Session = Depends(get_db)):
     # Either party can end

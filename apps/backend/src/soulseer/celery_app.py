@@ -21,7 +21,42 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @celery.task
 def run_daily_payouts():
-    # TODO: Implement Stripe Connect transfers to readers with balance > $15
+    # Implement Stripe Connect transfers to readers with balance > $15
+    import stripe
+    from datetime import datetime
+    stripe.api_key = settings.stripe_secret_key
+    db: Session = SessionLocal()
+    try:
+        # join balances and stripe accounts
+        rows = (
+            db.query(models.ReaderBalance, models.StripeAccount)
+            .join(models.StripeAccount, models.StripeAccount.user_id == models.ReaderBalance.user_id)
+            .filter(models.ReaderBalance.balance_cents > 1500, models.StripeAccount.details_submitted == True)
+            .all()
+        )
+        for rb, sa in rows:
+            amount = int(rb.balance_cents)
+            if amount <= 0:
+                continue
+            idempotency_key = f"payout:{rb.user_id}:{datetime.utcnow().strftime('%Y%m%d')}:{amount}"
+            try:
+                stripe.Transfer.create(
+                    amount=amount,
+                    currency='usd',
+                    destination=sa.account_id,
+                    description='SoulSeer daily payout',
+                    idempotency_key=idempotency_key,
+                )
+            except Exception:
+                # skip on failure
+                continue
+            # record ledger and zero out balance
+            db.add(models.ReaderLedgerEntry(reader_id=rb.user_id, kind='payout', amount_cents=amount, ref_type='transfer', ref_id=idempotency_key))
+            rb.balance_cents = 0
+            db.add(rb)
+        db.commit()
+    finally:
+        db.close()
     return True
 
 @celery.task

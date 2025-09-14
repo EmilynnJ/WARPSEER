@@ -1,0 +1,13 @@
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+select = ["E","F","B","I","UP","PL"]
+ignore = ["E203","E266","E501","W503"]
+
+[tool.mypy]
+plugins = []
+ignore_missing_imports = true
+strict = true
+python_version = "3.11"

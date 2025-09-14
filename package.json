@@ -1,0 +1,15 @@
+{
+  "name": "soulseer-monorepo",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "pnpm -w --parallel dev",
+    "build": "pnpm -w --parallel build",
+    "lint": "pnpm -w --parallel lint",
+    "format": "pnpm -w --parallel format"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

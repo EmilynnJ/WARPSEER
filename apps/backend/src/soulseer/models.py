@@ -111,6 +111,23 @@ class Gift(Base):
     image_url: Mapped[str] = mapped_column(String(512), default="")
     active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+class ReaderBalance(Base):
+    __tablename__ = "reader_balances"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+    balance_cents: Mapped[int] = mapped_column(Integer, default=0)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class ReaderLedgerEntry(Base):
+    __tablename__ = "reader_ledger_entries"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reader_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    kind: Mapped[str] = mapped_column(String(24))  # credit|debit|payout
+    amount_cents: Mapped[int] = mapped_column(Integer)
+    ref_type: Mapped[str] = mapped_column(String(32))  # session|gift|order|transfer
+    ref_id: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
 class Order(Base):
     __tablename__ = "orders"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -130,5 +147,7 @@ __all__ = [
     "StripeAccount",
     "Product",
     "Order",
+    "ReaderBalance",
+    "ReaderLedgerEntry",
     "Gift",
 ]

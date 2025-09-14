@@ -54,4 +54,17 @@ async def stripe_webhook(request: Request):
                     db.commit()
             finally:
                 db.close()
+    elif event["type"] == "account.updated":
+        acct = event["data"]["object"]
+        account_id = acct["id"]
+        details_submitted = acct.get("details_submitted", False)
+        db = SessionLocal()
+        try:
+            sa = db.query(models.StripeAccount).filter(models.StripeAccount.account_id == account_id).one_or_none()
+            if sa:
+                sa.details_submitted = bool(details_submitted)
+                db.add(sa)
+                db.commit()
+        finally:
+            db.close()
     return {"received": True}

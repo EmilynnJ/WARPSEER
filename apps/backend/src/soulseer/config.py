@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     stripe_secret_key: str
     stripe_webhook_signing_secret: str
 
+    frontend_public_url: Optional[str] = None
+    backend_public_url: Optional[str] = None
+
+    reader_share_pct: int = 70  # percent to readers
+
     webrtc_turn_servers: str = "relay1.expressturn.com:3480"
     webrtc_turn_username: Optional[str] = None
     webrtc_turn_credential: Optional[str] = None

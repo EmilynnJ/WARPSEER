@@ -8,6 +8,7 @@ from .routers import admin as admin_router
 from .routers import payments as payments_router
 from .routers import sessions as sessions_router
 from .routers import readers as readers_router
+from .routers import streams as streams_router
 from .routers import signaling as signaling_router
 import sentry_sdk
 
@@ -28,11 +29,14 @@ app.add_middleware(
 )
 
 app.include_router(health_router.router)
-app.include_router(users_router.router)
+app.include_router(streams_router.router)
+from .routers import cms as cms_router
+app.include_router(cms_router.router)
 app.include_router(admin_router.router)
 app.include_router(payments_router.router)
 app.include_router(sessions_router.router)
 app.include_router(readers_router.router)
+app.include_router(streams_router.router)
 app.include_router(signaling_router.router)
 
 @app.get("/")

@@ -87,12 +87,28 @@ class StripeAccount(Base):
     account_id: Mapped[str] = mapped_column(String(64), unique=True)
     details_submitted: Mapped[bool] = mapped_column(Boolean, default=False)
 
+class CmsPage(Base):
+    __tablename__ = "cms_pages"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    slug: Mapped[str] = mapped_column(String(120), unique=True)
+    title: Mapped[str] = mapped_column(String(200))
+    html_content: Mapped[str] = mapped_column(Text, default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 class Product(Base):
     __tablename__ = "products"
     id: Mapped[int] = mapped_column(primary_key=True)
     stripe_product_id: Mapped[str] = mapped_column(String(64), unique=True)
     name: Mapped[str] = mapped_column(String(200))
     kind: Mapped[str] = mapped_column(String(16))  # digital|physical|service
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+class Gift(Base):
+    __tablename__ = "gifts"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(120))
+    price_cents: Mapped[int] = mapped_column(Integer)
+    image_url: Mapped[str] = mapped_column(String(512), default="")
     active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 class Order(Base):
@@ -114,4 +130,5 @@ __all__ = [
     "StripeAccount",
     "Product",
     "Order",
+    "Gift",
 ]

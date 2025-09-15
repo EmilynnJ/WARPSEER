@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend
-COPY apps/backend/requirements.txt ./backend/
+COPY apps/backend/requirements.docker.txt ./backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY apps/backend ./backend
 

@@ -1,0 +1,14 @@
+# Ultra-simple Dockerfile that just runs the backend
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy and install backend
+COPY apps/backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY apps/backend .
+
+# Expose port and run
+EXPOSE 8080
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

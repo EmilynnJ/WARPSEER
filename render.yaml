@@ -2,14 +2,10 @@ services:
   # Backend API Service
   - type: web
     name: soulseer-backend
-    runtime: python
-    buildCommand: |
-      cd apps/backend
-      pip install -r requirements.txt
-      alembic upgrade head
-    startCommand: |
-      cd apps/backend
-      uvicorn src.soulseer.main:app --host 0.0.0.0 --port $PORT
+    env: python
+    rootDir: apps/backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn src.soulseer.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -36,14 +32,10 @@ services:
   # Frontend Service
   - type: web
     name: soulseer-frontend
-    runtime: node
-    buildCommand: |
-      cd apps/frontend
-      npm install
-      npm run build
-    startCommand: |
-      cd apps/frontend
-      npm run preview
+    env: node
+    rootDir: apps/frontend
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm run preview"
     envVars:
       - key: PUBLIC_BACKEND_URL
         fromService:
@@ -58,15 +50,18 @@ services:
   # Background Worker (Celery)
   - type: worker
     name: soulseer-worker
-    runtime: python
-    buildCommand: |
-      cd apps/backend
-      pip install -r requirements.txt
-    startCommand: |
-      cd apps/backend
-      celery -A src.soulseer.celery_app worker --loglevel=info
+    env: python
+    rootDir: apps/backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A src.soulseer.celery_app worker --loglevel=info"
     envVars:
       - fromGroup: soulseer-backend
+
+  # Redis Service
+  - type: redis
+    name: soulseer-redis
+    plan: starter
+    ipAllowList: []
 
 # Databases
 databases:
@@ -75,9 +70,3 @@ databases:
     plan: starter
     ipAllowList: []
 
-# Redis
-services:
-  - type: redis
-    name: soulseer-redis
-    plan: starter
-    ipAllowList: []

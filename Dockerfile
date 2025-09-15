@@ -31,32 +31,55 @@ WORKDIR /app/frontend
 RUN npm ci --production
 WORKDIR /app
 
-# Nginx config
-RUN echo 'server { \
-    listen 8080; \
-    location /api { \
-        proxy_pass http://127.0.0.1:8000; \
-        proxy_http_version 1.1; \
-        proxy_set_header Upgrade $http_upgrade; \
-        proxy_set_header Connection "upgrade"; \
-    } \
-    location / { \
-        proxy_pass http://127.0.0.1:3000; \
-    } \
-}' > /etc/nginx/sites-available/default
+# Create nginx config
+RUN cat > /etc/nginx/sites-available/default <<EOF
+server {
+    listen 8080;
+    location /api {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+}
+EOF
 
-# Supervisor config
-RUN echo '[supervisord] \
-nodaemon=true \
-[program:backend] \
-command=python -m uvicorn main:app --host 127.0.0.1 --port 8000 \
-directory=/app/backend \
-[program:frontend] \
-command=node build \
-environment=PORT="3000" \
-directory=/app/frontend \
-[program:nginx] \
-command=nginx -g "daemon off;"' > /etc/supervisor/conf.d/supervisord.conf
+# Create supervisor config
+RUN cat > /etc/supervisor/conf.d/supervisord.conf <<EOF
+[supervisord]
+nodaemon=true
+
+[program:backend]
+command=python -m uvicorn main:app --host 127.0.0.1 --port 8000
+directory=/app/backend
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/backend.err.log
+stdout_logfile=/var/log/backend.out.log
+
+[program:frontend]
+command=node build
+environment=PORT="3000",HOST="127.0.0.1"
+directory=/app/frontend
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/frontend.err.log
+stdout_logfile=/var/log/frontend.out.log
+
+[program:nginx]
+command=nginx -g "daemon off;"
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/nginx.err.log
+stdout_logfile=/var/log/nginx.out.log
+EOF
 
 EXPOSE 8080
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

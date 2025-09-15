@@ -1,8 +1,8 @@
 # Multi-stage build for Koyeb
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
-COPY apps/frontend/package*.json ./
-RUN npm ci
+COPY apps/frontend/package.json ./
+RUN npm install
 COPY apps/frontend ./
 RUN npm run build
 
@@ -26,9 +26,9 @@ COPY apps/backend ./backend
 
 # Copy frontend build
 COPY --from=frontend-builder /app/frontend/build ./frontend/build
-COPY --from=frontend-builder /app/frontend/package*.json ./frontend/
+COPY --from=frontend-builder /app/frontend/package.json ./frontend/
 WORKDIR /app/frontend
-RUN npm ci --production
+RUN npm install --production
 WORKDIR /app
 
 # Create nginx config

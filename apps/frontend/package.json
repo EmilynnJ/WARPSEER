@@ -7,7 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "start": "node build/index.js",
+"start": "node build",
     "lint": "biome check .",
     "format": "biome format ."
   },

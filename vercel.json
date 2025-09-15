@@ -1,6 +1,5 @@
 {
-  "framework": "sveltekit",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "rootDirectory": "apps/frontend"
+  "buildCommand": "cd apps/frontend && npm install && npm run build",
+  "installCommand": "npm install -g pnpm",
+  "framework": "sveltekit"
 }

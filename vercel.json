@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd apps/frontend && npm run build",
+  "outputDirectory": "apps/frontend/.vercel/output",
+  "framework": "sveltekit",
+  "installCommand": "cd apps/frontend && npm install",
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet ."
+}

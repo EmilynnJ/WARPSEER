@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     s3_secret_access_key: Optional[str] = None
 
     sentry_dsn_backend: Optional[str] = None
+    
+    onesignal_app_id: Optional[str] = None
+    onesignal_api_key: Optional[str] = None
+    
+    enable_push_notifications: bool = False
 
     class Config:
         env_file = ".env"

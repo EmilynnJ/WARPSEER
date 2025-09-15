@@ -66,6 +66,10 @@ async def request_session(payload: dict, token=Depends(get_current_user_token), 
     db.add(session)
     db.commit()
     db.refresh(session)
+    # Send notification to reader
+    from ..services.notifications import notify_session_request
+    import asyncio
+    asyncio.create_task(notify_session_request(db, reader_id, session.session_uid))
     # Notify reader via Redis channel
     r = get_redis()
     r.publish(f"user_notify:{reader_id}", f"new_session:{session.session_uid}")

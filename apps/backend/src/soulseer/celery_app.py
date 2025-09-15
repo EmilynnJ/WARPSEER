@@ -18,6 +18,8 @@ def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(24*60*60, run_daily_payouts.s(), name='daily_payouts')
     # Billing tick every minute
     sender.add_periodic_task(60.0, billing_tick.s(), name='billing_tick')
+    # Appointment reminders every 5 minutes
+    sender.add_periodic_task(5*60.0, appointment_reminders.s(), name='appointment_reminders')
 
 @celery.task
 def run_daily_payouts():
@@ -54,6 +56,50 @@ def run_daily_payouts():
             db.add(models.ReaderLedgerEntry(reader_id=rb.user_id, kind='payout', amount_cents=amount, ref_type='transfer', ref_id=idempotency_key))
             rb.balance_cents = 0
             db.add(rb)
+        db.commit()
+    finally:
+        db.close()
+    return True
+
+@celery.task
+def appointment_reminders():
+    """Send appointment reminders 1 hour and 15 minutes before start"""
+    from datetime import datetime, timedelta
+    from .services.notifications import notify_appointment_reminder
+    import asyncio
+    
+    db: Session = SessionLocal()
+    try:
+        now = datetime.utcnow()
+        
+        # 1 hour reminder
+        hour_window_start = now + timedelta(minutes=59)
+        hour_window_end = now + timedelta(minutes=61)
+        
+        appts_1h = db.query(models.Appointment).filter(
+            models.Appointment.status == 'scheduled',
+            models.Appointment.start_time >= hour_window_start,
+            models.Appointment.start_time <= hour_window_end
+        ).all()
+        
+        for appt in appts_1h:
+            asyncio.run(notify_appointment_reminder(db, appt.client_id, appt, 60))
+            asyncio.run(notify_appointment_reminder(db, appt.reader_id, appt, 60))
+        
+        # 15 minutes reminder
+        min15_window_start = now + timedelta(minutes=14)
+        min15_window_end = now + timedelta(minutes=16)
+        
+        appts_15m = db.query(models.Appointment).filter(
+            models.Appointment.status == 'scheduled',
+            models.Appointment.start_time >= min15_window_start,
+            models.Appointment.start_time <= min15_window_end
+        ).all()
+        
+        for appt in appts_15m:
+            asyncio.run(notify_appointment_reminder(db, appt.client_id, appt, 15))
+            asyncio.run(notify_appointment_reminder(db, appt.reader_id, appt, 15))
+        
         db.commit()
     finally:
         db.close()

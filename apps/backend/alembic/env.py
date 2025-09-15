@@ -19,7 +19,8 @@ from soulseer import models  # noqa: F401
 target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
-    url = os.environ.get('DATABASE_URL')
+    from soulseer.config import settings
+    url = settings.database_url
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -31,8 +32,12 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 def run_migrations_online() -> None:
+    from soulseer.config import settings
+    config_section = config.get_section(config.config_ini_section, {})
+    config_section['sqlalchemy.url'] = settings.database_url
+    
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        config_section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

@@ -11,6 +11,8 @@ from .routers import connect as connect_router
 from .routers import readers as readers_router
 from .routers import streams as streams_router
 from .routers import appointments as appointments_router
+from .routers import notifications as notifications_router
+from .routers import marketplace as marketplace_router
 from .routers import signaling as signaling_router
 import sentry_sdk
 
@@ -42,6 +44,8 @@ app.include_router(streams_router.router)
 app.include_router(signaling_router.router)
 app.include_router(connect_router.router)
 app.include_router(appointments_router.router)
+app.include_router(notifications_router.router)
+app.include_router(marketplace_router.router)
 
 @app.get("/")
 def root():

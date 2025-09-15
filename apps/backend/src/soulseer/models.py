@@ -110,7 +110,12 @@ class Product(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     stripe_product_id: Mapped[str] = mapped_column(String(64), unique=True)
     name: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text, default="")
+    price_cents: Mapped[int] = mapped_column(Integer, default=0)
+    image_url: Mapped[str] = mapped_column(String(512), default="")
     kind: Mapped[str] = mapped_column(String(16))  # digital|physical|service
+    stock_quantity: Mapped[int] = mapped_column(Integer, default=-1)  # -1 = unlimited
+    reader_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 class Gift(Base):
@@ -147,6 +152,53 @@ class StreamGift(Base):
     amount_cents: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+class Notification(Base):
+    __tablename__ = "notifications"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    title: Mapped[str] = mapped_column(String(200))
+    body: Mapped[str] = mapped_column(Text)
+    type: Mapped[str] = mapped_column(String(32))  # session_request|appointment_reminder|stream_start|gift_received
+    read: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class PushSubscription(Base):
+    __tablename__ = "push_subscriptions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    player_id: Mapped[str] = mapped_column(String(128), unique=True)  # OneSignal player ID
+    device_type: Mapped[str] = mapped_column(String(32))  # web|ios|android
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class OrderItem(Base):
+    __tablename__ = "order_items"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"))
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
+    quantity: Mapped[int] = mapped_column(Integer, default=1)
+    price_cents: Mapped[int] = mapped_column(Integer)
+
+class ShippingAddress(Base):
+    __tablename__ = "shipping_addresses"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"))
+    name: Mapped[str] = mapped_column(String(200))
+    address_line1: Mapped[str] = mapped_column(String(255))
+    address_line2: Mapped[str] = mapped_column(String(255), default="")
+    city: Mapped[str] = mapped_column(String(100))
+    state: Mapped[str] = mapped_column(String(100))
+    postal_code: Mapped[str] = mapped_column(String(20))
+    country: Mapped[str] = mapped_column(String(2), default="US")
+
+class DigitalDownload(Base):
+    __tablename__ = "digital_downloads"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
+    file_url: Mapped[str] = mapped_column(String(512))
+    file_size: Mapped[int] = mapped_column(Integer, default=0)
+    download_limit: Mapped[int] = mapped_column(Integer, default=0)  # 0 = unlimited
+
 class Order(Base):
     __tablename__ = "orders"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -170,4 +222,9 @@ __all__ = [
     "ReaderLedgerEntry",
     "Gift",
     "StreamGift",
+    "Notification",
+    "PushSubscription",
+    "OrderItem",
+    "ShippingAddress",
+    "DigitalDownload",
 ]

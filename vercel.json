@@ -1,4 +1,14 @@
 {
-  "root": "apps/frontend",
-  "framework": "sveltekit"
+  "buildCommand": "cd apps/frontend && npm install --legacy-peer-deps && npm run build",
+  "outputDirectory": "apps/frontend/.svelte-kit",
+  "installCommand": "pip install -r apps/backend/requirements.txt",
+  "functions": {
+    "api/**/*.py": {
+      "runtime": "python3.9"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/apps/frontend/$1" }
+  ]
 }

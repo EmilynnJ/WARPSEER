@@ -7,7 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "start": "node build",
+    "start": "node build/index.js",
     "lint": "biome check .",
     "format": "biome format ."
   },
@@ -24,7 +24,7 @@
   "devDependencies": {
     "@skeletonlabs/skeleton": "^2.10.1",
     "@sveltejs/adapter-auto": "^3.2.2",
-    "@sveltejs/adapter-vercel": "^5.0.0",
+    "@sveltejs/adapter-node": "^5.0.1",
     "autoprefixer": "^10.4.19",
     "@biomejs/biome": "^1.8.3",
     "postcss": "^8.4.39",

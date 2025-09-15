@@ -1,9 +1,11 @@
-import adapter from '@sveltejs/adapter-vercel';
+import adapter from '@sveltejs/adapter-node';
 
 const config = {
   kit: {
     adapter: adapter({
-      runtime: 'nodejs20.x'
+      out: 'build',
+      precompress: false,
+      envPrefix: '',
     }),
     alias: {
       $lib: 'src/lib'

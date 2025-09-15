@@ -1,0 +1,23 @@
+{
+	# Optional: enable admin API on unix socket
+	admin off
+}
+
+:8080 {
+	encode gzip
+
+	# Backend API
+	handle_path /api/* {
+		reverse_proxy 127.0.0.1:8000
+	}
+
+	# WebSocket pass-through for signaling
+	handler /ws* {
+		reverse_proxy 127.0.0.1:8000 {
+			headers_up Host {host}
+		}
+	}
+
+	# Everything else -> SvelteKit frontend
+	reverse_proxy 127.0.0.1:3000
+}

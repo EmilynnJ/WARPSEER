@@ -1,0 +1,17 @@
+[build]
+builder = "nixpacks"
+buildCommand = """
+  echo "Building monorepo..."
+  cd apps/frontend && npm install && npm run build && cd ../..
+  cd apps/backend && pip install -r requirements.txt && cd ../..
+"""
+
+[deploy]
+startCommand = """
+  # Start both services
+  cd apps/backend && uvicorn src.soulseer.main:app --host 0.0.0.0 --port ${PORT:-8000} &
+  cd apps/frontend && PORT=${FRONTEND_PORT:-3000} npm run preview
+"""
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"

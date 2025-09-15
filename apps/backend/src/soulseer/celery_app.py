@@ -65,7 +65,7 @@ def billing_tick():
     db: Session = SessionLocal()
     try:
         # Find active sessions
-        sessions = db.query(models.Session).filter(models.Session.status == 'active').all()
+        sessions = db.query(models.Session).filter(models.Session.status == 'active', models.Session.per_minute == True).all()
         for s in sessions:
             # Presence check: both client and reader seen recently
             p_client = r.get(f'session:{s.session_uid}:user:{s.client_id}')

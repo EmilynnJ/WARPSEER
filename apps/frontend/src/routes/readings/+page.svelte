@@ -32,6 +32,7 @@
           <a class="px-3 py-2 bg-mystic-pink text-black rounded" href={`/session/request?reader_id=${r.user_id}&mode=chat`}>Chat</a>
           <a class="px-3 py-2 bg-mystic-gold text-black rounded" href={`/session/request?reader_id=${r.user_id}&mode=voice`}>Voice</a>
           <a class="px-3 py-2 bg-white text-black rounded" href={`/session/request?reader_id=${r.user_id}&mode=video`}>Video</a>
+          <a class="px-3 py-2 bg-white/80 text-black rounded" href={`/schedule/${r.user_id}`}>Schedule</a>
         </div>
       </div>
     {/each}

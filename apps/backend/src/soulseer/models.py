@@ -58,6 +58,8 @@ class Session(Base):
     ended_at: Mapped[datetime | None]
     total_seconds: Mapped[int] = mapped_column(Integer, default=0)
     amount_charged_cents: Mapped[int] = mapped_column(Integer, default=0)
+    per_minute: Mapped[bool] = mapped_column(Boolean, default=True)
+    appointment_id: Mapped[int | None] = mapped_column(ForeignKey("appointments.id"), nullable=True)
 
 class Message(Base):
     __tablename__ = "messages"
@@ -78,7 +80,7 @@ class Appointment(Base):
     price_cents: Mapped[int] = mapped_column(Integer)
     start_time: Mapped[datetime]
     end_time: Mapped[datetime]
-    status: Mapped[str] = mapped_column(String(16), default="scheduled")  # scheduled|canceled|completed
+    status: Mapped[str] = mapped_column(String(16), default="scheduled")  # scheduled|canceled|completed|in_progress
 
 class StripeAccount(Base):
     __tablename__ = "stripe_accounts"
@@ -94,6 +96,14 @@ class CmsPage(Base):
     title: Mapped[str] = mapped_column(String(200))
     html_content: Mapped[str] = mapped_column(Text, default="")
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class AvailabilityBlock(Base):
+    __tablename__ = "availability_blocks"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reader_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    start_time: Mapped[datetime]
+    end_time: Mapped[datetime]
+    timezone: Mapped[str] = mapped_column(String(64), default="UTC")
 
 class Product(Base):
     __tablename__ = "products"

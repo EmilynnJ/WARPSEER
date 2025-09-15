@@ -111,5 +111,17 @@ async def end_session(session_uid: str, token=Depends(get_current_user_token), d
     sess.status = "ended"
     sess.ended_at = datetime.utcnow()
     db.add(sess)
+    # If scheduled appointment, credit reader now
+    if sess.appointment_id and not sess.per_minute:
+        appt = db.query(models.Appointment).filter(models.Appointment.id == sess.appointment_id).one_or_none()
+        if appt and appt.status in {'scheduled','in_progress'}:
+            appt.status = 'completed'
+            db.add(appt)
+            # credit reader share
+            from ..services.billing import credit_reader
+            from ..config import settings as _settings
+            reader_share = _settings.reader_share_pct
+            amount = appt.price_cents * reader_share // 100
+            credit_reader(db, sess.reader_id, amount, ref_type='appointment', ref_id=appt.booking_uid)
     db.commit()
     return {"ok": True}

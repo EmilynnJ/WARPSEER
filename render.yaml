@@ -38,10 +38,7 @@ services:
     startCommand: "npm run preview"
     envVars:
       - key: PUBLIC_BACKEND_URL
-        fromService:
-          type: web
-          name: soulseer-backend
-          property: hostUrl
+        sync: false
       - key: PUBLIC_STRIPE_KEY
         value: pk_live_51JY2J5KBeGJ0fV26C6zN0crXCLmqQ7oagXck1LnozE94NAIjk7HWugb5Eb9eUpXfqawyRDD3WlPAcWT6f6Wt9uv5009H97Xbax
       - key: NODE_VERSION

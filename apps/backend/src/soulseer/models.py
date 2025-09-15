@@ -138,6 +138,15 @@ class ReaderLedgerEntry(Base):
     ref_id: Mapped[str] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+class StreamGift(Base):
+    __tablename__ = "stream_gifts"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("sessions.id", ondelete="CASCADE"))
+    sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    gift_id: Mapped[int] = mapped_column(ForeignKey("gifts.id"))
+    amount_cents: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
 class Order(Base):
     __tablename__ = "orders"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -160,4 +169,5 @@ __all__ = [
     "ReaderBalance",
     "ReaderLedgerEntry",
     "Gift",
+    "StreamGift",
 ]

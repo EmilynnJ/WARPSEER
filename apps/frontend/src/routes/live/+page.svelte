@@ -23,7 +23,7 @@
   {/if}
   <div class="grid md:grid-cols-3 gap-6 mt-4">
     {#each streams as s}
-      <a class="p-6 rounded-xl bg-white/5 ring-1 ring-white/10 hover:ring-mystic-pink transition" href={`/session/${s.session_uid}`}>
+      <a class="p-6 rounded-xl bg-white/5 ring-1 ring-white/10 hover:ring-mystic-pink transition" href={`/stream/${s.session_uid}`}>
         <div class="font-display text-lg">Live with Reader #{s.reader_id}</div>
         <div class="text-white/70 text-sm">Started: {new Date(s.started_at).toLocaleString()}</div>
       </a>

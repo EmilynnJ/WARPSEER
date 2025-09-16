@@ -1,13 +1,9 @@
 <script lang="ts">
   import '../app.css';
-  export let data;
-</script>
-
-<script lang="ts">
-  import '../app.css';
-  export let data;
   import { t } from '$lib/i18n';
   import LangSwitcher from '$lib/components/LangSwitcher.svelte';
+  
+  export let data;
 </script>
 
 <nav class="sticky top-0 z-40 backdrop-blur bg-black/40 border-b border-white/10 supports-[backdrop-filter]:bg-black/30">

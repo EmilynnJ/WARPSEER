@@ -1,12 +1,46 @@
 {
-  "buildCommand": "cd apps/frontend && npm install --legacy-peer-deps && npm run build",
-  "outputDirectory": "apps/frontend/.svelte-kit",
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "python3.9"
+  "builds": [
+    {
+      "src": "apps/frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    },
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "25mb" }
     }
-  },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/static/(.*)",
+      "headers": { "cache-control": "s-maxage=31536000,immutable" },
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/manifest.json",
+      "headers": { "cache-control": "s-maxage=0" },
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "/favicon.ico",
+      "headers": { "cache-control": "s-maxage=0" },
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "/logo192.png",
+      "headers": { "cache-control": "s-maxage=31536000,immutable" },
+      "dest": "/logo192.png"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/apps/frontend/$1"
+    }
   ]
 }

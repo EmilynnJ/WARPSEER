@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "vercel-build": "npm install --legacy-peer-deps && npm run build",
     "preview": "vite preview --host 0.0.0.0",
-"start": "node build",
+    "start": "node build",
     "lint": "biome check .",
     "format": "biome format ."
   },

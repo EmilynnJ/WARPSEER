@@ -13,7 +13,7 @@
     "format": "biome format ."
   },
   "dependencies": {
-    "@sveltejs/kit": "^2.5.10",
+    "@sveltejs/kit": "^2.52.2",
     "@tanstack/svelte-query": "^5.51.1",
     "axios": "^1.7.2",
     "clsx": "^2.1.1",
@@ -36,7 +36,7 @@
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4",
-    "vite": "^7.1.5",
+    "vite": "^7.3.1",
     "vite-plugin-pwa": "^1.0.3"
   }
 }
